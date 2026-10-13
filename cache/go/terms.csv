@@ -2999,6 +2999,7 @@ GO:0044284,mitochondrial crista junction,2026-09-11T22:06:28.667173
 GO:0044320,cellular response to leptin stimulus,2026-06-08T00:19:06.626649
 GO:0044325,transmembrane transporter binding,2026-10-04T04:47:18.209827
 GO:0044331,cell-cell adhesion mediated by cadherin,2026-04-24T18:44:40.188994
+GO:0044346,fibroblast apoptotic process,2026-10-13T10:37:01.976746
 GO:0044351,macropinocytosis,2026-09-04T16:15:59.324986
 GO:0044364,obsolete disruption of cells of another organism,2026-03-17T19:29:53.418207
 GO:0044394,protein malonylation,2026-08-01T05:14:52.378548
@@ -3358,6 +3359,7 @@ GO:0050830,defense response to Gram-positive bacterium,2026-09-24T20:26:35.91313
 GO:0050832,defense response to fungus,2026-03-17T19:47:28.777430
 GO:0050833,pyruvate transmembrane transporter activity,2026-10-12T18:39:13.511385
 GO:0050839,cell adhesion molecule binding,2026-08-22T13:49:07.826110
+GO:0050840,extracellular matrix binding,2026-10-13T11:16:48.069235
 GO:0050847,progesterone receptor signaling pathway,2026-06-22T11:33:43.214268
 GO:0050852,T cell receptor signaling pathway,2026-04-12T22:51:57.132484
 GO:0050853,B cell receptor signaling pathway,2026-05-03T15:42:44.669946
