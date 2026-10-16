@@ -1,0 +1,84 @@
+# Compound file — SKELETON
+# Validate:  linkml-validate -s src/dismech/schema/npc_ext.yaml -C CompoundProfile kb/compounds/miglustat.yaml
+#
+# mechanism_effects             = observed, quoted evidence required
+# hypothesized_mechanism_effects = proposals (from you or the agent), rationale
+#                                  + review_status required, NEVER treated as evidence
+# Regulatory years and statuses below must be verified against the cited sources.
+
+name: miglustat
+compound:
+  preferred_term: miglustat
+  # term: {id: CHEBI:..., label: miglustat}
+compound_xrefs:
+  - ChEMBL:TODO
+  - PubChem:TODO
+
+regulatory_statuses:
+  - status: APPROVED
+    jurisdiction: EMA
+    indication: {preferred_term: Niemann-Pick disease type C}
+    year: 2009          # verify
+    evidence:
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: HUMAN_CLINICAL
+        snippet: "TODO exact sentence"
+  - status: APPROVED
+    jurisdiction: FDA
+    indication: {preferred_term: Gaucher disease type 1}
+    year: 2003          # verify
+    evidence:
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: HUMAN_CLINICAL
+        snippet: "TODO exact sentence"
+
+cns_penetration:
+  level: DEMONSTRATED_HUMAN   # verify
+  evidence:
+    - reference: PMID:TODO
+      supports: SUPPORT
+      evidence_source: HUMAN_CLINICAL
+      snippet: "TODO exact sentence"
+      experimental_context:
+        organism: {preferred_term: Homo sapiens}
+        experimental_system: PATIENT_BIOSAMPLE
+        context_notes: CSF drug levels
+
+target_interactions:
+  - target_gene: {preferred_term: UGCG}
+    action: INHIBITOR
+    is_primary_target: true
+    evidence:
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: IN_VITRO
+        snippet: "TODO exact sentence"
+        experimental_context:
+          organism: {preferred_term: Homo sapiens}
+          experimental_system: CELL_FREE
+
+mechanism_effects:
+  - mechanism: "NPC1#Secondary glycosphingolipid accumulation"
+    effect: PARTIALLY_REVERSES
+    evidence:
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: MODEL_ORGANISM
+        snippet: "TODO exact sentence"
+        experimental_context:
+          organism: {preferred_term: Mus musculus}
+          experimental_system: MAMMALIAN_MODEL
+
+# FORMAT EXAMPLE ONLY — not a claim
+hypothesized_mechanism_effects:
+  - mechanism: "NPC1#Impaired autophagic flux"
+    predicted_effect: PARTIALLY_REVERSES
+    rationale: >-
+      Example of the format: state which evidence-backed nodes and edges the
+      prediction relies on, and what result would refute it.
+    supporting_path:
+      - "NPC1#Secondary glycosphingolipid accumulation"
+    generated_by: "example"
+    review_status: PROPOSED

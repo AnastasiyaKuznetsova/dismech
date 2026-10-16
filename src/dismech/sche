@@ -1,0 +1,437 @@
+id: https://example.org/npc-mechkb/schema
+name: npc_ext
+title: NPC mechanism KB — extension of the DisMech schema
+description: >-
+  Extends the DisMech LinkML schema with (1) mandatory experimental context on
+  every evidence item, (2) direction on every causal edge, (3) a molecular
+  pathway layer stored in kb/pathways/, and (4) a compound layer stored in
+  kb/compounds/. Observed compound effects and agent-generated hypotheses are
+  kept in separate slots so a hypothesis can never be read as evidence.
+version: 0.1.0
+license: CC-BY-4.0
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  dismech: https://w3id.org/monarch-initiative/dismech/
+  npcext: https://example.org/npc-mechkb/   # TODO: replace with your own namespace
+
+default_prefix: npcext
+default_range: string
+
+imports:
+  - linkml:types
+  - dismech   # assumes this file sits next to dismech.yaml in your fork (src/dismech/schema/)
+
+# ---------------------------------------------------------------------------
+# Types
+# ---------------------------------------------------------------------------
+types:
+  NodeReference:
+    typeof: string
+    description: >-
+      Reference to a mechanism node in another file, written as
+      "<file_stem>#<node name>", e.g. "NPC1#Late endosomal cholesterol accumulation"
+      or "lysosomal_cholesterol_egress#NPC1 exports cholesterol from lysosome".
+      Same convention DisMech uses for conforms_to.
+    pattern: "^[A-Za-z0-9_\\-]+#.+$"
+
+  ExternalCurie:
+    typeof: string
+    description: A CURIE for an external, non-OBO resource (Reactome, WikiPathways, ChEMBL, PubChem, DrugBank).
+    pattern: "^[A-Za-z][A-Za-z0-9_.]*:[^\\s]+$"
+
+# ---------------------------------------------------------------------------
+# Enums
+# ---------------------------------------------------------------------------
+enums:
+  EffectDirectionEnum:
+    description: What the upstream node does to the downstream node.
+    permissible_values:
+      INCREASES:
+        description: Upstream raises the level or activity of the downstream node.
+      DECREASES:
+        description: Upstream lowers the level or activity of the downstream node.
+      CAUSES:
+        description: Qualitative causation where increase/decrease does not apply (e.g. a state leads to cell death).
+      NO_EFFECT:
+        description: Tested and no effect found. Recording negative results prevents the agent from inventing the link.
+
+  ExperimentalSystemEnum:
+    description: >-
+      Finer-grained than DisMech's EvidenceSourceEnum. Records the actual system
+      in which the quoted result was obtained.
+    permissible_values:
+      PATIENT_IN_VIVO:
+        description: Measurements in living patients (clinical, imaging, trials).
+      PATIENT_BIOSAMPLE:
+        description: Patient fluids or tissues (CSF, plasma, post-mortem brain, biopsy).
+      PATIENT_PRIMARY_CELLS:
+        description: Primary cells from patients, e.g. skin fibroblasts.
+      PATIENT_IPSC_DERIVED:
+        description: iPSC-derived cells from patients (neurons, glia, hepatocytes).
+      ENGINEERED_HUMAN_CELLS:
+        description: Human cell lines with engineered genotype (knockout, knock-in, overexpression).
+      MAMMALIAN_MODEL:
+        description: Mouse, cat, or other mammalian in vivo model.
+      NON_MAMMALIAN_MODEL:
+        description: Zebrafish, Drosophila, C. elegans, yeast.
+      CELL_FREE:
+        description: Purified proteins, reconstituted systems, structural biology.
+      COMPUTATIONAL:
+        description: Simulation, docking, ML prediction.
+
+  PathwayStepTypeEnum:
+    permissible_values:
+      BINDING:
+      TRANSPORT:
+        description: Movement of a molecule across a membrane or between compartments.
+      ENZYMATIC_CONVERSION:
+      PROTEIN_TRAFFICKING:
+      SIGNALING:
+      TRANSCRIPTIONAL_REGULATION:
+      PROTEIN_DEGRADATION:
+      ORGANELLE_CONTACT:
+        description: Membrane contact site-mediated transfer (ER–lysosome, etc.).
+      STORAGE_ACCUMULATION:
+      OTHER:
+
+  DrugActionEnum:
+    permissible_values:
+      INHIBITOR:
+      ACTIVATOR:
+      AGONIST:
+      ANTAGONIST:
+      ALLOSTERIC_MODULATOR:
+      PHARMACOLOGICAL_CHAPERONE:
+      PROTEOSTASIS_REGULATOR:
+        description: Acts on chaperones, heat-shock response, or degradation machinery rather than the target protein itself.
+      SUBSTRATE_REDUCTION:
+      LIPID_SEQUESTRANT:
+        description: Physically binds and mobilises lipid (e.g. cyclodextrins).
+      UNKNOWN:
+
+  CnsPenetrationEnum:
+    permissible_values:
+      DEMONSTRATED_HUMAN:
+      DEMONSTRATED_ANIMAL:
+      PREDICTED_ONLY:
+      POOR:
+      REQUIRES_CNS_DELIVERY:
+        description: Effective only with intrathecal/intracerebroventricular delivery.
+      UNKNOWN:
+
+  RegulatoryStatusEnum:
+    permissible_values:
+      APPROVED:
+      CONDITIONALLY_APPROVED:
+      IN_CLINICAL_TRIAL:
+      PRECLINICAL:
+      WITHDRAWN:
+      REJECTED:
+
+  JurisdictionEnum:
+    permissible_values:
+      FDA:
+      EMA:
+      PMDA:
+      MHRA:
+      OTHER:
+
+  MechanismEffectEnum:
+    description: Effect of a compound on a mechanism node.
+    permissible_values:
+      REVERSES:
+        description: Moves the node back toward the healthy state.
+      PARTIALLY_REVERSES:
+      WORSENS:
+      NO_EFFECT:
+
+  ReviewStatusEnum:
+    permissible_values:
+      PROPOSED:
+        description: Generated by an agent or curator, not yet reviewed.
+      ACCEPTED_FOR_TESTING:
+      REJECTED:
+      CONFIRMED:
+        description: Later confirmed experimentally; move to mechanism_effects with evidence.
+
+# ---------------------------------------------------------------------------
+# Slots (new ones only; DisMech slots are reused by name)
+# ---------------------------------------------------------------------------
+slots:
+  experimental_context:
+    range: ExperimentalContext
+    inlined: true
+    required: true
+  organism:
+    range: OrganismDescriptor
+    inlined: true
+    required: true
+  experimental_system:
+    range: ExperimentalSystemEnum
+    required: true
+  effect_direction:
+    range: EffectDirectionEnum
+    required: true
+  pathway_mappings:
+    range: ExternalCurie
+    multivalued: true
+    description: Reactome, WikiPathways or GO-BP identifiers for the same pathway.
+  pathway_steps:
+    range: PathwayStep
+    multivalued: true
+    inlined_as_list: true
+    required: true
+  step_type:
+    range: PathwayStepTypeEnum
+    required: true
+  next_steps:
+    range: StepEdge
+    multivalued: true
+    inlined_as_list: true
+  step_target:
+    range: string
+    required: true
+    description: Name of a step in the same pathway, or "<pathway_file>#<step name>" for a step in another pathway.
+  implements_mechanisms:
+    range: NodeReference
+    multivalued: true
+    description: Disease or module mechanism nodes that this pathway explains at molecular level.
+  implemented_by:
+    range: NodeReference
+    multivalued: true
+    description: Pathway steps that give the molecular detail of this mechanism node.
+  compound:
+    range: ChemicalEntityDescriptor
+    inlined: true
+    required: true
+  compound_xrefs:
+    range: ExternalCurie
+    multivalued: true
+  regulatory_statuses:
+    range: RegulatoryStatus
+    multivalued: true
+    inlined_as_list: true
+  cns_penetration:
+    range: CnsPenetrationAssessment
+    inlined: true
+  target_interactions:
+    range: DrugTargetInteraction
+    multivalued: true
+    inlined_as_list: true
+  mechanism_effects:
+    range: CompoundMechanismEffect
+    multivalued: true
+    inlined_as_list: true
+  hypothesized_mechanism_effects:
+    range: CompoundMechanismHypothesis
+    multivalued: true
+    inlined_as_list: true
+
+# ---------------------------------------------------------------------------
+# Classes
+# ---------------------------------------------------------------------------
+classes:
+
+  # --- Evidence with mandatory context -------------------------------------
+  ExperimentalContext:
+    description: Where a quoted result was obtained. Required on every evidence item in this extension.
+    slots:
+      - organism
+      - experimental_system
+      - cell_types            # DisMech slot, CellTypeDescriptor
+      - locations             # DisMech slot (anatomical locations)
+    attributes:
+      context_notes:
+        description: Free text, e.g. "NPC1 I1061T homozygous fibroblasts".
+
+  ContextualizedEvidenceItem:
+    is_a: EvidenceItem
+    description: >-
+      DisMech EvidenceItem (reference + exact snippet + supports +
+      evidence_source) plus a required experimental context. Passes the
+      DisMech reference validator unchanged.
+    slots:
+      - experimental_context
+
+  # --- Directed, context-bearing causal edges ------------------------------
+  ContextualizedCausalEdge:
+    is_a: CausalEdge
+    description: DisMech CausalEdge with a required direction and context-bearing evidence.
+    slots:
+      - effect_direction
+    slot_usage:
+      evidence:
+        range: ContextualizedEvidenceItem
+        required: true
+
+  ExtendedPathophysiology:
+    is_a: Pathophysiology
+    description: DisMech mechanism node whose edges and evidence carry context, optionally linked to pathway steps.
+    slots:
+      - implemented_by
+    slot_usage:
+      downstream:
+        range: ContextualizedCausalEdge
+      evidence:
+        range: ContextualizedEvidenceItem
+        required: true
+
+  ExtendedDisease:
+    is_a: Disease
+    description: Root class for disease files in this KB (validate with --target-class ExtendedDisease).
+    slot_usage:
+      pathophysiology:
+        range: ExtendedPathophysiology
+
+  # --- Pathway layer (kb/pathways/*.yaml) ----------------------------------
+  MolecularPathway:
+    description: >-
+      A molecular-level pathway stored in its own file and shared across
+      diseases. Steps are finer than DisMech mechanism nodes.
+      Validate with --target-class MolecularPathway.
+    slots:
+      - name
+      - description
+      - pathway_mappings
+      - biological_processes    # DisMech slot, BiologicalProcessDescriptor
+      - implements_mechanisms
+      - pathway_steps
+    attributes:
+      pathway_id:
+        identifier: true
+        description: Must equal the file stem, e.g. lysosomal_cholesterol_egress.
+
+  PathwayStep:
+    slots:
+      - name
+      - description
+      - step_type
+      - genes                   # DisMech slot, GeneDescriptor
+      - chemical_entities       # DisMech slot, ChemicalEntityDescriptor
+      - molecular_functions     # DisMech slot, MolecularFunctionDescriptor
+      - cellular_components     # DisMech slot, where the step happens
+      - next_steps
+      - evidence
+    slot_usage:
+      name:
+        required: true
+      evidence:
+        range: ContextualizedEvidenceItem
+        required: true
+
+  StepEdge:
+    slots:
+      - step_target
+      - effect_direction
+      - evidence
+    slot_usage:
+      evidence:
+        range: ContextualizedEvidenceItem
+        required: true
+
+  # --- Compound layer (kb/compounds/*.yaml) --------------------------------
+  CompoundProfile:
+    description: >-
+      One file per compound. Observed effects (with evidence) and hypotheses
+      (with rationale and review status) live in separate slots.
+      Validate with --target-class CompoundProfile.
+    slots:
+      - name
+      - compound
+      - compound_xrefs
+      - regulatory_statuses
+      - cns_penetration
+      - target_interactions
+      - mechanism_effects
+      - hypothesized_mechanism_effects
+      - notes
+
+  RegulatoryStatus:
+    attributes:
+      status:
+        range: RegulatoryStatusEnum
+        required: true
+      jurisdiction:
+        range: JurisdictionEnum
+        required: true
+      indication:
+        range: ConditionDescriptor   # DisMech class, bindable to MONDO
+        inlined: true
+        required: true
+      year:
+        range: integer
+    slots:
+      - evidence
+
+  CnsPenetrationAssessment:
+    attributes:
+      level:
+        range: CnsPenetrationEnum
+        required: true
+    slots:
+      - evidence
+    slot_usage:
+      evidence:
+        range: ContextualizedEvidenceItem
+
+  DrugTargetInteraction:
+    attributes:
+      target_gene:
+        range: GeneDescriptor
+        inlined: true
+        required: true
+      action:
+        range: DrugActionEnum
+        required: true
+      potency:
+        description: Free text, e.g. "IC50 = 20 nM (biochemical)".
+      is_primary_target:
+        range: boolean
+    slots:
+      - evidence
+    slot_usage:
+      evidence:
+        range: ContextualizedEvidenceItem
+        required: true
+
+  CompoundMechanismEffect:
+    description: An observed effect, backed by quoted evidence.
+    attributes:
+      mechanism:
+        range: NodeReference
+        required: true
+      effect:
+        range: MechanismEffectEnum
+        required: true
+    slots:
+      - evidence
+    slot_usage:
+      evidence:
+        range: ContextualizedEvidenceItem
+        required: true
+
+  CompoundMechanismHypothesis:
+    description: >-
+      A proposed effect that has NOT been observed. Never exported as an
+      evidence-backed edge; exported with a hypothesis flag.
+    attributes:
+      mechanism:
+        range: NodeReference
+        required: true
+      predicted_effect:
+        range: MechanismEffectEnum
+        required: true
+      rationale:
+        required: true
+        description: The reasoning chain, referring to nodes and edges that do have evidence.
+      supporting_path:
+        range: NodeReference
+        multivalued: true
+        description: The evidence-backed nodes the rationale relies on.
+      generated_by:
+        required: true
+        description: e.g. "curator:anastasia" or "agent:claude-opus-5-5/2026-10-16".
+      review_status:
+        range: ReviewStatusEnum
+        required: true

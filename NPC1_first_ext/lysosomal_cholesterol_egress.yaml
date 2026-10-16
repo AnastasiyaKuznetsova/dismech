@@ -1,0 +1,112 @@
+# Pathway file — SKELETON
+# Validate:  linkml-validate -s src/dismech/schema/npc_ext.yaml -C MolecularPathway kb/pathways/lysosomal_cholesterol_egress.yaml
+#
+# Steps describe NORMAL physiology. Disease files point to the step that fails
+# (implemented_by), so the same pathway serves NPC1, NPC2, LAL-D and any
+# neurodegenerative disease that touches it.
+# All PMID:TODO / snippets are placeholders to be replaced with exact quotes.
+
+pathway_id: lysosomal_cholesterol_egress
+name: Lysosomal cholesterol egress
+description: >-
+  Route of LDL-derived cholesterol from endocytosis through lysosomal
+  hydrolysis, NPC2/NPC1 handoff and export to the ER, where it feeds back on
+  SREBP2 signalling and is esterified.
+pathway_mappings:
+  - Reactome:TODO      # add the matching Reactome / WikiPathways / GO-BP IDs
+implements_mechanisms:
+  - "NPC1#Unesterified cholesterol accumulation in late endosomes/lysosomes"
+  - "NPC1#Reduced cholesterol delivery to ER"
+  - "NPC1#SREBP2 pathway activation"
+
+pathway_steps:
+
+  - name: LDL receptor-mediated endocytosis of LDL
+    step_type: PROTEIN_TRAFFICKING
+    genes: [{preferred_term: LDLR}]
+    cellular_components: [{preferred_term: plasma membrane}, {preferred_term: early endosome}]
+    evidence: &todo
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: IN_VITRO
+        snippet: "TODO exact sentence"
+        experimental_context:
+          organism: {preferred_term: Homo sapiens}
+          experimental_system: ENGINEERED_HUMAN_CELLS
+    next_steps:
+      - step_target: Hydrolysis of cholesteryl esters by lysosomal acid lipase
+        effect_direction: INCREASES
+        evidence: *todo
+
+  - name: Hydrolysis of cholesteryl esters by lysosomal acid lipase
+    step_type: ENZYMATIC_CONVERSION
+    genes: [{preferred_term: LIPA}]
+    chemical_entities: [{preferred_term: cholesteryl ester}, {preferred_term: cholesterol}]
+    cellular_components: [{preferred_term: lysosomal lumen}]
+    evidence: *todo
+    next_steps:
+      - step_target: NPC2 binds unesterified cholesterol in the lysosomal lumen
+        effect_direction: INCREASES
+        evidence: *todo
+
+  - name: NPC2 binds unesterified cholesterol in the lysosomal lumen
+    step_type: BINDING
+    genes: [{preferred_term: NPC2}]
+    cellular_components: [{preferred_term: lysosomal lumen}]
+    evidence: *todo
+    next_steps:
+      - step_target: NPC2 hands cholesterol to the NPC1 N-terminal domain
+        effect_direction: INCREASES
+        evidence: *todo
+
+  - name: NPC2 hands cholesterol to the NPC1 N-terminal domain
+    step_type: BINDING
+    genes: [{preferred_term: NPC2}, {preferred_term: NPC1}]
+    evidence:
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: IN_VITRO
+        snippet: "TODO exact sentence"
+        experimental_context:
+          organism: {preferred_term: Homo sapiens}
+          experimental_system: CELL_FREE
+          context_notes: purified proteins / structure
+    next_steps:
+      - step_target: NPC1 moves cholesterol to the lysosomal membrane
+        effect_direction: INCREASES
+        evidence: *todo
+
+  - name: NPC1 moves cholesterol to the lysosomal membrane
+    step_type: TRANSPORT
+    genes: [{preferred_term: NPC1}]
+    cellular_components: [{preferred_term: lysosomal membrane}]
+    evidence: *todo
+    next_steps:
+      - step_target: Cholesterol transfer from lysosome to ER at contact sites
+        effect_direction: INCREASES
+        evidence: *todo
+
+  - name: Cholesterol transfer from lysosome to ER at contact sites
+    step_type: ORGANELLE_CONTACT
+    genes: [{preferred_term: OSBPL1A}, {preferred_term: STARD3}]   # curate: which transfer proteins, in which cells
+    cellular_components: [{preferred_term: endoplasmic reticulum}, {preferred_term: lysosomal membrane}]
+    evidence: *todo
+    next_steps:
+      - step_target: ER cholesterol retains SCAP-SREBP2 in the ER
+        effect_direction: INCREASES
+        evidence: *todo
+      - step_target: Cholesterol esterification by SOAT1
+        effect_direction: INCREASES
+        evidence: *todo
+
+  - name: ER cholesterol retains SCAP-SREBP2 in the ER
+    step_type: SIGNALING
+    genes: [{preferred_term: SCAP}, {preferred_term: SREBF2}, {preferred_term: INSIG1}]
+    cellular_components: [{preferred_term: endoplasmic reticulum membrane}]
+    evidence: *todo
+
+  - name: Cholesterol esterification by SOAT1
+    step_type: ENZYMATIC_CONVERSION
+    genes: [{preferred_term: SOAT1}]
+    chemical_entities: [{preferred_term: cholesterol}, {preferred_term: cholesteryl ester}]
+    evidence: *todo

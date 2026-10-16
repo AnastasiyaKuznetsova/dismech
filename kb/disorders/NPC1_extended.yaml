@@ -1,0 +1,149 @@
+# NPC1 disease file — SKELETON
+# Validate:  linkml-validate -s src/dismech/schema/npc_ext.yaml -C ExtendedDisease kb/disorders/NPC1.yaml
+#
+# Conventions
+#  * Nodes are ABNORMAL STATES ("X accumulation", "reduced Y"). Edges say how one
+#    state drives the next (INCREASES / DECREASES / CAUSES / NO_EFFECT).
+#  * Every PMID:TODO and snippet below is a placeholder. Replace with a real
+#    reference and an EXACT sentence copied from its abstract; the reference
+#    validator rejects anything else. Nothing here is a factual claim yet.
+#  * &todo_cells / *todo_cells are YAML anchors used only to keep this skeleton
+#    short. In the real file every edge gets its own evidence list.
+#  * Ontology terms: add  term: {id: ..., label: ...}  under preferred_term;
+#    the term validator checks the ID/label pair.
+
+name: Niemann-Pick disease type C1
+disease_term:
+  preferred_term: Niemann-Pick disease type C1
+  # term: {id: MONDO:..., label: ...}
+description: >-
+  Autosomal recessive lysosomal lipid storage disorder caused by biallelic NPC1
+  variants, characterised by late endosomal/lysosomal accumulation of
+  unesterified cholesterol and glycosphingolipids and progressive
+  neurodegeneration.
+
+pathophysiology:
+
+  - name: NPC1 loss of function
+    description: Biallelic NPC1 variants reduce the amount or activity of NPC1 protein in late endosomes/lysosomes.
+    genes:
+      - preferred_term: NPC1
+        # term: {id: HGNC:..., label: NPC1}
+    evidence:
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: HUMAN_CLINICAL
+        snippet: "TODO exact sentence"
+        experimental_context:
+          organism: {preferred_term: Homo sapiens}
+          experimental_system: PATIENT_IN_VIVO
+    downstream:
+      - target: Unesterified cholesterol accumulation in late endosomes/lysosomes
+        effect_direction: INCREASES
+        evidence:
+          - reference: PMID:TODO
+            supports: SUPPORT
+            evidence_source: IN_VITRO
+            snippet: "TODO exact sentence"
+            experimental_context:
+              organism: {preferred_term: Homo sapiens}
+              experimental_system: PATIENT_PRIMARY_CELLS
+              cell_types:
+                - preferred_term: fibroblast
+              context_notes: TODO genotype
+
+  - name: Unesterified cholesterol accumulation in late endosomes/lysosomes
+    description: Cholesterol released from LDL-derived cholesteryl esters cannot leave the lysosome.
+    implemented_by:
+      - "lysosomal_cholesterol_egress#NPC1 moves cholesterol to the lysosomal membrane"
+    cellular_components:
+      - preferred_term: late endosome
+      - preferred_term: lysosome
+    evidence:
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: IN_VITRO
+        snippet: "TODO exact sentence"
+        experimental_context:
+          organism: {preferred_term: Homo sapiens}
+          experimental_system: PATIENT_PRIMARY_CELLS
+    downstream:
+      - target: Reduced cholesterol delivery to ER
+        effect_direction: CAUSES
+        evidence: &todo_cells
+          - reference: PMID:TODO
+            supports: SUPPORT
+            evidence_source: IN_VITRO
+            snippet: "TODO exact sentence"
+            experimental_context:
+              organism: {preferred_term: Homo sapiens}
+              experimental_system: PATIENT_PRIMARY_CELLS
+      - target: Secondary glycosphingolipid accumulation
+        effect_direction: INCREASES
+        evidence: *todo_cells
+      - target: Lysosomal mTORC1 hyperactivation
+        effect_direction: INCREASES
+        evidence: *todo_cells
+
+  - name: Reduced cholesterol delivery to ER
+    description: Less cholesterol reaches the ER, which the cell reads as cholesterol deficiency.
+    implemented_by:
+      - "lysosomal_cholesterol_egress#Cholesterol transfer from lysosome to ER at contact sites"
+    evidence: *todo_cells
+    downstream:
+      - target: SREBP2 pathway activation
+        effect_direction: INCREASES
+        evidence: *todo_cells
+
+  - name: SREBP2 pathway activation
+    description: Sterol-regulated genes (cholesterol synthesis and uptake) are induced despite lysosomal overload.
+    implemented_by:
+      - "lysosomal_cholesterol_egress#ER cholesterol retains SCAP-SREBP2 in the ER"
+    genes:
+      - preferred_term: SREBF2
+      - preferred_term: SCAP
+    evidence: *todo_cells
+
+  - name: Secondary glycosphingolipid accumulation
+    description: Gangliosides (e.g. GM2, GM3) and glucosylceramide accumulate secondarily to cholesterol storage.
+    evidence: *todo_cells
+
+  - name: Lysosomal mTORC1 hyperactivation
+    description: Lysosomal cholesterol signals to mTORC1, which suppresses autophagy and lysosome biogenesis.
+    evidence: *todo_cells
+    downstream:
+      - target: Impaired autophagic flux
+        effect_direction: CAUSES
+        evidence: *todo_cells
+
+  - name: Impaired autophagic flux
+    evidence: *todo_cells
+    downstream:
+      - target: Purkinje cell degeneration
+        effect_direction: CAUSES
+        evidence:
+          - reference: PMID:TODO
+            supports: PARTIAL
+            evidence_source: MODEL_ORGANISM
+            snippet: "TODO exact sentence"
+            experimental_context:
+              organism: {preferred_term: Mus musculus}
+              experimental_system: MAMMALIAN_MODEL
+              cell_types:
+                - preferred_term: Purkinje cell
+              context_notes: TODO e.g. Npc1-/- BALB/c
+
+  - name: Purkinje cell degeneration
+    cell_types:
+      - preferred_term: Purkinje cell
+    locations:
+      - preferred_term: cerebellum
+    evidence:
+      - reference: PMID:TODO
+        supports: SUPPORT
+        evidence_source: HUMAN_CLINICAL
+        snippet: "TODO exact sentence"
+        experimental_context:
+          organism: {preferred_term: Homo sapiens}
+          experimental_system: PATIENT_BIOSAMPLE
+          context_notes: post-mortem cerebellum
